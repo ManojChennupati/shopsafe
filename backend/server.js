@@ -76,8 +76,8 @@ async function start() {
     console.warn("[EscrowService] Order/product browsing still works, but checkout requires Hardhat.");
   }
 
-  // Start background settlement poller (every 30s for demo)
-  startSettlementPoller(30_000);
+  // Start background settlement poller (every 2 minutes for demo)
+  startSettlementPoller(120_000);
 
   app.listen(PORT, () => {
     console.log(`[Server] ShopSafe backend running on http://localhost:${PORT}`);
