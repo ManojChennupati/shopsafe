@@ -1,0 +1,30 @@
+# ── Dependencies ──────────────────────────────────────────────────────────────
+node_modules/
+
+# ── Environment / Secrets (NEVER commit these) ────────────────────────────────
+.env
+.env.local
+.env.*.local
+backend/.env
+backend/.env.local
+
+# ── Hardhat build artifacts ───────────────────────────────────────────────────
+artifacts/
+cache/
+typechain/
+typechain-types/
+
+# ── Generated deployment config (re-created by npm run deploy) ────────────────
+backend/config/deployment.json
+backend/config/SecureEscrow.abi.json
+
+# ── Frontend build output ─────────────────────────────────────────────────────
+dist/
+frontend/dist/
+
+# ── OS / editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/

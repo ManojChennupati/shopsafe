@@ -1,0 +1,20 @@
+{
+  "name": "shopsafe",
+  "version": "1.0.0",
+  "description": "Secure E-Commerce with Internal Blockchain Escrow",
+  "private": true,
+  "scripts": {
+    "chain": "npx hardhat node",
+    "deploy": "npx hardhat run scripts/deploy-local.js --network localhost",
+    "test:contracts": "npx hardhat test",
+    "compile": "npx hardhat compile",
+    "backend": "node backend/server.js",
+    "frontend": "npm --prefix frontend run dev"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "chai": "^4.3.10",
+    "hardhat": "^2.22.0"
+  }
+}
