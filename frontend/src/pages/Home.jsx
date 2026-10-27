@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { api } from '../api/client';
 import { useCart } from '../context/CartContext';
@@ -16,11 +15,89 @@ function Stars({ rating }) {
   );
 }
 
+// ── Product Quick-View Modal ──────────────────────────────────────────────────
+function QuickView({ product, onClose, onAdd }) {
+  if (!product) return null;
+  return (
+    <div
+      style={{
+        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        zIndex: 300, padding: '1rem'
+      }}
+      onClick={onClose}
+    >
+      <div
+        className="card fade-in"
+        style={{ maxWidth: 480, width: '100%', position: 'relative' }}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute', top: '0.75rem', right: '0.75rem',
+            background: 'none', border: 'none', color: 'var(--text-muted)',
+            fontSize: '1.3rem', cursor: 'pointer', lineHeight: 1
+          }}
+        >✕</button>
+
+        {/* Product image */}
+        <div style={{
+          background: 'var(--bg-card2)', borderRadius: '12px',
+          padding: '2rem', textAlign: 'center', marginBottom: '1.25rem'
+        }}>
+          <span style={{ fontSize: '6rem' }}>{getProductEmoji(product)}</span>
+        </div>
+
+        <div className="product-category" style={{ marginBottom: '0.4rem' }}>
+          {product.category}
+        </div>
+        <div style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: '1.3rem', marginBottom: '0.5rem' }}>
+          {product.name}
+        </div>
+        <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem', lineHeight: 1.6 }}>
+          {product.description}
+        </div>
+
+        <div className="product-rating" style={{ marginBottom: '1rem' }}>
+          <Stars rating={product.rating} />
+          <span>{product.rating} ({product.reviews} reviews)</span>
+        </div>
+
+        {product.stock <= 5 && product.stock > 0 && (
+          <div style={{ color: 'var(--warning)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
+            ⚠️ Only {product.stock} left in stock!
+          </div>
+        )}
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+          <div style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: '1.6rem', color: 'var(--primary-light)' }}>
+            {formatINR(product.price)}
+          </div>
+          <button
+            id={`quickview-add-${product._id}`}
+            className="btn btn-primary"
+            style={{ flex: 1, maxWidth: 180 }}
+            onClick={() => { onAdd(product); onClose(); }}
+          >
+            🛒 Add to Cart
+          </button>
+        </div>
+
+        <div className="escrow-badge" style={{ marginTop: '1rem' }}>
+          🔐 Payment protected by blockchain escrow
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [quickView, setQuickView] = useState(null);
   const { addItem } = useCart();
-  const navigate = useNavigate();
 
   useEffect(() => {
     api.getProducts()
@@ -29,8 +106,7 @@ export default function Home() {
       .finally(() => setLoading(false));
   }, []);
 
-  function handleAdd(e, product) {
-    e.stopPropagation();
+  function handleAdd(product) {
     addItem(product);
     toast.success(`${product.name.split(' ').slice(0,2).join(' ')} added to cart`, {
       icon: '🛒',
@@ -91,7 +167,8 @@ export default function Home() {
               <div
                 key={product._id}
                 className="product-card"
-                onClick={() => navigate(`/product/${product._id}`)}
+                style={{ cursor: 'pointer' }}
+                onClick={() => setQuickView(product)}
               >
                 <div className="product-image" style={{ background: 'var(--bg-card2)' }}>
                   <span style={{ fontSize: '5rem' }}>{getProductEmoji(product)}</span>
@@ -111,7 +188,7 @@ export default function Home() {
                     <button
                       id={`add-${product._id}`}
                       className="add-btn"
-                      onClick={e => handleAdd(e, product)}
+                      onClick={e => { e.stopPropagation(); handleAdd(product); }}
                     >
                       + Add
                     </button>
@@ -122,6 +199,13 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {/* Quick View Modal */}
+      <QuickView
+        product={quickView}
+        onClose={() => setQuickView(null)}
+        onAdd={handleAdd}
+      />
     </div>
   );
 }
